@@ -6,8 +6,12 @@ public class PackBehaviour : MonoBehaviour
 {
     public Rigidbody rb;
     public Transform puller;
-    public float rb_t = 10f;
+    public float rb_x;
+    public float rb_y;
+    public float rb_z;
     public bool inSight;
+    public float range = 10f;
+    private bool pushBack;
     // Start is called before the first frame update
 
     private void Awake()
@@ -17,13 +21,13 @@ public class PackBehaviour : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.AddForce(0,100,10);
+        rb.AddForce(rb_x,rb_y,rb_z);
     }
 
     // Update is called once per frame
     void Update()
     {
-        inSight = Physics.CheckSphere(transform.position, rb_t);
+        inSight = Physics.CheckSphere(transform.position, range);
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -35,13 +39,7 @@ public class PackBehaviour : MonoBehaviour
         //puller = GameObject.FindWithTag("Pull").transform;
 
     }
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Push"))
-        {
-            rb.AddForce(rb_t,rb_t,rb_t);
-        }
-    }
+    
     private void FixedUpdate()
     {
         if (inSight) 
@@ -49,8 +47,21 @@ public class PackBehaviour : MonoBehaviour
                   
             rb.AddForce(puller.position - rb.transform.position,ForceMode.Force);
         }       
+        if (pushBack)
+        {
+            rb.AddForce(rb.transform.position - rb.transform.position, ForceMode.Force);
+        }
+        else pushBack = false;
     }
-
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Push"))
+        {
+            pushBack = true;
+        }
+        
+        //rb.AddForce(rb.transform.position - other.transform.position, ForceMode.Force);
+    }
 
     private void OnDrawGizmosSelected()
     {

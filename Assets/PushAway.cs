@@ -16,8 +16,5 @@ public class PushAway : MonoBehaviour
     {
         
     }
-    private void OnTriggerExit(Collider other)
-    {
-        
-    }
+    
 }

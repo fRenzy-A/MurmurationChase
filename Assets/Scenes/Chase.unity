@@ -556,8 +556,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
   puller: {fileID: 0}
-  rb_t: 10
+  rb_x: 400
+  rb_y: 0
+  rb_z: 0
   inSight: 0
+  range: 10
 --- !u!54 &1607737091
 Rigidbody:
   m_ObjectHideFlags: 0
