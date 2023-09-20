@@ -6,12 +6,21 @@ public class PackBehaviour : MonoBehaviour
 {
     public Rigidbody rb;
     public Transform puller;
-    public float rb_x;
-    public float rb_y;
-    public float rb_z;
     public bool inSight;
+
+    public float myVelocity;
+
+
+    public float mySpeed;
+    public float x;
+    public float y;
+    public float z;
+
     public float range = 10f;
-    private bool pushBack;
+
+    public bool outOfBounds;
+
+    public float howMuchForce;
     // Start is called before the first frame update
 
     private void Awake()
@@ -21,7 +30,8 @@ public class PackBehaviour : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.AddForce(rb_x,rb_y,rb_z);
+        outOfBounds = false;
+        //rb.AddForce(, ForceMode.Impulse);
     }
 
     // Update is called once per frame
@@ -29,38 +39,40 @@ public class PackBehaviour : MonoBehaviour
     {
         inSight = Physics.CheckSphere(transform.position, range);
     }
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Pull"))
-        {
-            puller = other.transform;
-        }
-        
-        //puller = GameObject.FindWithTag("Pull").transform;
-
-    }
+    
     
     private void FixedUpdate()
     {
-        if (inSight) 
+        mySpeed = rb.velocity.magnitude;
+        if ((rb.velocity.magnitude > myVelocity && rb.velocity.magnitude > 0) || (rb.velocity.magnitude > -myVelocity && rb.velocity.magnitude < 0))
         {
-                  
-            rb.AddForce(puller.position - rb.transform.position,ForceMode.Force);
-        }       
-        if (pushBack)
-        {
-            rb.AddForce(rb.transform.position - rb.transform.position, ForceMode.Force);
+            rb.velocity = Vector3.ClampMagnitude(rb.velocity, myVelocity);
         }
-        else pushBack = false;
+        else
+        {
+            rb.AddForce(x, y, z); 
+            
+        }
+ 
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        /*if (other.gameObject.CompareTag("Push"))
+        {
+            x *= -x;
+            outOfBounds = true;
+        }*/
+
+        outOfBounds = false;
     }
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Push"))
+        if (other.gameObject.CompareTag("Push"))
         {
-            pushBack = true;
+            x *= -1;
+            outOfBounds = true;
         }
-        
-        //rb.AddForce(rb.transform.position - other.transform.position, ForceMode.Force);
+            
     }
 
     private void OnDrawGizmosSelected()
