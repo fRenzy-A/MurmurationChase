@@ -16,11 +16,19 @@ public class PackBehaviour : MonoBehaviour
     public float y;
     public float z;
 
+    public float xBounds;
+    public float yBounds;
+    public float zBounds;
+
+
+    public float forceOfBounds;
+
     public float range = 10f;
 
     public bool outOfBounds;
 
     public float howMuchForce;
+    float xOOB; float yOOB; float zOOB;
 
     public Transform bounds;
     // Start is called before the first frame update
@@ -31,10 +39,15 @@ public class PackBehaviour : MonoBehaviour
     }
     void Start()
     {
+        xOOB = forceOfBounds; yOOB = forceOfBounds; zOOB = forceOfBounds;
         bounds = GameObject.FindWithTag("Push").GetComponent<Transform>();
         rb = GetComponent<Rigidbody>();
         outOfBounds = false;
-        rb.AddForce(Random.Range(5,10),0,0/*Random.Range(1, 10), Random.Range(1, 10)*/, ForceMode.Impulse);
+        rb.AddForce(Random.Range(5,10),Random.Range(1, 10), Random.Range(1, 10), ForceMode.Impulse);
+        xBounds = 20 + bounds.transform.position.x;
+        yBounds = 20 + bounds.transform.position.y;
+        zBounds = 20 + bounds.transform.position.z;
+        
         
     }
 
@@ -47,12 +60,17 @@ public class PackBehaviour : MonoBehaviour
     
     private void FixedUpdate()
     {
-        //x = rb.velocity.x;//; y = rb.velocity.y; z = rb.velocity.z;
+        x = rb.velocity.x; y = rb.velocity.y; z = rb.velocity.z;
         mySpeed = rb.velocity.magnitude;
         if ((rb.velocity.magnitude > myVelocity && rb.velocity.magnitude > 0) || (rb.velocity.magnitude > -myVelocity && rb.velocity.magnitude < 0))
         {
             rb.velocity = Vector3.ClampMagnitude(rb.velocity, myVelocity);
         }
+        if (outOfBounds)
+        {
+            
+        }
+        else return;
         Bounds();
         /*if (outOfBounds)
         {
@@ -70,34 +88,41 @@ public class PackBehaviour : MonoBehaviour
             }
             // rb.AddForce(x * 2, y *2, z * 2);
         }*/
- 
+
     }
 
     private void Bounds()
     {
-        float xBounds;
-        float yBounds;
-        float zBounds;
-        if (((bounds.transform.localScale.x < rb.transform.position.x) && rb.transform.position.x > 0) || ((-bounds.transform.localScale.x > rb.transform.position.x) && rb.transform.position.x < 0))
+        
+        if ((xBounds < rb.transform.position.x) && rb.transform.position.x > bounds.transform.position.x)
         {
-            xBounds = rb.velocity.x * -1;
-            //xBounds = x;
-            if (((xBounds < x)&& xBounds > 0)|| ((-xBounds < x)&& xBounds <0))
-            {
-                
-            }
-            rb.AddForce(x * 2, 0, 0);
+            //xOOB = xOOB * -1;
+            rb.AddForce(-xOOB * 2, 0, 0);
+        }
+        else if ((-xBounds > rb.transform.position.x) && rb.transform.position.x < bounds.transform.position.x)
+        {
+            //xOOB = xOOB * -1;
+            rb.AddForce(xOOB * 2, 0, 0);
+        }
 
-        }
-        if (((bounds.transform.localScale.y < rb.transform.position.y) && rb.transform.position.y > 0) || ((-bounds.transform.localScale.y > rb.transform.position.y) && rb.transform.position.y < 0))
+        if ((yBounds < rb.transform.position.y) && rb.transform.position.y > bounds.transform.position.y)
         {
-            y = rb.velocity.y * -1;
-            rb.AddForce(0, y * 2, 0);
+            //yOOB = yOOB * -1;
+            rb.AddForce(0, -yOOB * 2, 0);
         }
-        if (((bounds.transform.localScale.z < rb.transform.position.z) && rb.transform.position.z > 0) || ((-bounds.transform.localScale.z > rb.transform.position.z) && rb.transform.position.z < 0))
+        else if ((-yBounds > rb.transform.position.y) && rb.transform.position.y < bounds.transform.position.y)
         {
-            z = rb.velocity.z * -1;
-            rb.AddForce(0, 0, z * 2);
+            rb.AddForce(0, yOOB * 2, 0);
+        }
+
+        if ((zBounds < rb.transform.position.z) && rb.transform.position.z > bounds.transform.position.z)
+        {
+            //zOOB = zOOB * -1;
+            rb.AddForce(0, 0, -zOOB * 2);
+        }
+        else if ((-zBounds > rb.transform.position.z) && rb.transform.position.z < bounds.transform.position.z)
+        {
+            rb.AddForce(0, 0, zOOB * 2);
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -105,7 +130,7 @@ public class PackBehaviour : MonoBehaviour
         /*if (other.gameObject.CompareTag("Push"))
         {
             x *= -x;
-            outOfBounds = true;
+            outOfBounds = true
         }*/
 
         outOfBounds = false;
@@ -127,6 +152,24 @@ public class PackBehaviour : MonoBehaviour
                 z = rb.velocity.z * -1;
             }
             
+        }*/
+        /*if (other.gameObject.CompareTag("Push"))
+        {
+            if (((xBounds < rb.transform.position.x) && rb.transform.position.x > 0) || ((-xBounds > rb.transform.position.x) && rb.transform.position.x < 0))
+            {
+                xOOB = xOOB * -1;
+                
+            }
+            if (((yBounds < rb.transform.position.y) && rb.transform.position.y > 0) || ((-yBounds > rb.transform.position.y) && rb.transform.position.y < 0))
+            {
+                yOOB = yOOB * -1;
+                
+            }
+            if (((zBounds < rb.transform.position.z) && rb.transform.position.z > 0) || ((-zBounds > rb.transform.position.z) && rb.transform.position.z < 0))
+            {
+                zOOB = zOOB * -1;
+                
+            }
         }*/
         outOfBounds = true;
 
