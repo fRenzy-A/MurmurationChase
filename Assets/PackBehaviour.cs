@@ -23,12 +23,14 @@ public class PackBehaviour : MonoBehaviour
 
     public float forceOfBounds;
 
-    public float range = 10f;
-
+    public float pullRange = 10f;
+    public float pushRange = 3f;
     public bool outOfBounds;
 
     public float howMuchForce;
     float xOOB; float yOOB; float zOOB;
+
+    public Collider[] howMany;
 
     public Transform bounds;
     // Start is called before the first frame update
@@ -54,7 +56,8 @@ public class PackBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        inSight = Physics.CheckSphere(transform.position, range);
+        inSight = Physics.CheckSphere(transform.position, pushRange);
+
     }
     
     
@@ -62,33 +65,41 @@ public class PackBehaviour : MonoBehaviour
     {
         x = rb.velocity.x; y = rb.velocity.y; z = rb.velocity.z;
         mySpeed = rb.velocity.magnitude;
+        //cap the maximum velocity/speed
         if ((rb.velocity.magnitude > myVelocity && rb.velocity.magnitude > 0) || (rb.velocity.magnitude > -myVelocity && rb.velocity.magnitude < 0))
         {
             rb.velocity = Vector3.ClampMagnitude(rb.velocity, myVelocity);
         }
-        if (outOfBounds)
-        {
-            
-        }
-        else return;
-        Bounds();
-        /*if (outOfBounds)
-        {
-            if (((bounds.transform.localScale.x < rb.transform.position.x) && rb.transform.position.x > 0) || ((-bounds.transform.localScale.x > rb.transform.position.x) && rb.transform.position.x < 0))
-            {
-                
-            }
-            if (((bounds.transform.localScale.y < rb.transform.position.y) && rb.transform.position.y > 0) || ((-bounds.transform.localScale.y > rb.transform.position.y) && rb.transform.position.y < 0))
-            {
-                
-            }
-            if (((bounds.transform.localScale.z < rb.transform.position.z) && rb.transform.position.z > 0) || ((-bounds.transform.localScale.z > rb.transform.position.z) && rb.transform.position.z < 0))
-            {
-                
-            }
-            // rb.AddForce(x * 2, y *2, z * 2);
-        }*/
+        Collider[] inMyRadius = Physics.OverlapSphere(rb.transform.position,pullRange);
 
+        Collider[] inMyPushRadius = Physics.OverlapSphere(rb.transform.position, pushRange);
+        howMany = inMyPushRadius;
+        
+        foreach (Collider c in inMyRadius) 
+        {
+            if (c.CompareTag("Push"))
+            {
+                return;
+            }
+            
+            else if (c.transform.root != c.transform)
+            {
+                rb.AddForce(c.transform.position - rb.transform.position, ForceMode.Acceleration);
+            }        
+        }
+        foreach (Collider d in inMyPushRadius)
+        {
+            if (d.CompareTag("Push"))
+            {
+                return;
+            }
+            else if (d.transform.root != d.transform)
+            {
+               
+                rb.AddForce(d.transform.position + rb.transform.position * 3, ForceMode.Acceleration);
+            }
+        }
+        Bounds();
     }
 
     private void Bounds()
@@ -178,5 +189,8 @@ public class PackBehaviour : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, pullRange);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, pushRange);
     }
 }
