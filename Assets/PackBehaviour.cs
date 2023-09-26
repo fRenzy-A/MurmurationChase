@@ -4,21 +4,24 @@ using UnityEngine;
 
 public class PackBehaviour : MonoBehaviour
 {
+    public GameObject smools;
     public Rigidbody rb;
     public Transform puller;
+    public SmoolsController smoolsController;
+    public SphereCollider repelArea;
     public bool inSight;
 
-    public float maxVelocity;
+    /*public int maxVelocity;*/
 
 
     public float mySpeed;
 
-    public float pullMultiplier;
-    public float pushAwayMultiplier;
+    /*public int pullMultiplier;
+    public int pushMultiplier;*/
 
-    public float pullNPushXMult;
-    public float pullNPushYMult;
-    public float pullNPushZMult;
+    /*public int pullXMult;
+    public int pullYMult;
+    public int pullZMult;*/
 
     public float xBounds;
     public float yBounds;
@@ -27,11 +30,10 @@ public class PackBehaviour : MonoBehaviour
 
     public float forceOfBounds;
 
-    public float pullRange = 10f;
-    public float pushRange = 1f;
-    public bool outOfBounds;
+    /*public int pullRange;
+    public int pushRange;
+    public bool outOfBounds;*/
 
-    public float howMuchForce;
     float xOOB; float yOOB; float zOOB;
 
     public Collider[] howMany;
@@ -41,14 +43,17 @@ public class PackBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        
+        repelArea = GetComponent<SphereCollider>();
+        smools = GameObject.Find("SpawnSmools");
+        smoolsController = smools.GetComponent<SmoolsController>();
     }
     void Start()
     {
+        
         xOOB = forceOfBounds; yOOB = forceOfBounds; zOOB = forceOfBounds;
         bounds = GameObject.FindWithTag("Push").GetComponent<Transform>();
         rb = GetComponent<Rigidbody>();
-        outOfBounds = false;
+        //outOfBounds = false;
 
         rb.AddForce(Random.Range(1,10),Random.Range(1, 10), Random.Range(1, 10), ForceMode.Impulse);
 
@@ -63,24 +68,22 @@ public class PackBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        inSight = Physics.CheckSphere(transform.position, pushRange);
+        //inSight = Physics.CheckSphere(transform.position, pushRange);
 
     }
     
     
     private void FixedUpdate()
     {
-        //x = rb.velocity.x; y = rb.velocity.y; z = rb.velocity.z;
-        mySpeed = rb.velocity.magnitude;
         //cap the maximum velocity/speed
-        if ((rb.velocity.magnitude > maxVelocity && rb.velocity.magnitude > 0) || (rb.velocity.magnitude > -maxVelocity && rb.velocity.magnitude < 0))
+        if ((rb.velocity.magnitude > smoolsController.MaxSpeedCap && rb.velocity.magnitude > 0) || (rb.velocity.magnitude > -smoolsController.MaxSpeedCap && rb.velocity.magnitude < 0))
         {
-            rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxVelocity);
+            rb.velocity = Vector3.ClampMagnitude(rb.velocity, smoolsController.MaxSpeedCap);
         }
-        Collider[] inMyRadius = Physics.OverlapSphere(rb.transform.position,pullRange);
+        Collider[] inMyRadius = Physics.OverlapSphere(rb.transform.position,smoolsController.AttractRange);
 
-        Collider[] inMyPushRadius = Physics.OverlapSphere(rb.transform.position, pushRange);
-        howMany = inMyPushRadius;
+        //Collider[] inMyPushRadius = Physics.OverlapSphere(rb.transform.position, pushRange);
+        //howMany = inMyPushRadius;
 
         foreach (Collider c in inMyRadius)
         {
@@ -88,16 +91,15 @@ public class PackBehaviour : MonoBehaviour
             {
                 return;
             }
-            /*else if (c.transform.root != c.transform)
-            {
-                
-            }*/
             else
             {
-                rb.AddForce((c.transform.position - rb.transform.position), ForceMode.Force);
+                float attX = (c.transform.position.x - rb.transform.position.x) * smoolsController.AttractMultiplier;
+                float attY = (c.transform.position.y - rb.transform.position.y) * smoolsController.AttractMultiplier;
+                float attZ = (c.transform.position.z - rb.transform.position.z) * smoolsController.AttractMultiplier;
+                rb.AddForce(/*(c.transform.position - rb.transform.position)* smoolsController.AttractMultiplier*/ attX * smoolsController.AttractOffsetX, attY * smoolsController.AttractOffsetY,attZ * smoolsController.AttractOffsetZ, ForceMode.Acceleration);
             }
         }
-        foreach (Collider d in inMyPushRadius)
+        /*foreach (Collider d in inMyPushRadius)
         {
             if (d.CompareTag("Push"))
             {
@@ -107,12 +109,13 @@ public class PackBehaviour : MonoBehaviour
             {
                 Vector3 dir = d.transform.position - transform.position;
                 dir = -dir;
-                rb.AddForce(dir * 5, ForceMode.Impulse);
+                rb.AddForce(dir * pushAwayMultiplier, ForceMode.Force);
             }
             
             //else rb.AddForce(d.transform.position + rb.transform.position, ForceMode.Impulse);
-        }
+        }*/
         Bounds();
+        repelArea.radius = smoolsController.RepelRange;
     }
 
     private void Bounds()
@@ -150,12 +153,20 @@ public class PackBehaviour : MonoBehaviour
         }
     }
 
-
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.CompareTag("Push"))
+        {
+            Vector3 dir = other.transform.position - transform.position;
+            dir = -dir;
+            rb.AddForce(dir * (smoolsController.RepelMultiplier), ForceMode.Impulse);
+        }
+    }
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, pullRange);
+        /*Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, smoolsController.AttractRange);
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, pushRange);
+        Gizmos.DrawWireSphere(transform.position, smoolsController.RepelRange);*/
     }
 }
