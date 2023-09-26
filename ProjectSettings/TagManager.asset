@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Pull
   - Push
+  - Chaser
   layers:
   - Default
   - TransparentFX
