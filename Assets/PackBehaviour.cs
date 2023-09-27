@@ -114,11 +114,11 @@ public class PackBehaviour : MonoBehaviour
             
             //else rb.AddForce(d.transform.position + rb.transform.position, ForceMode.Impulse);
         }*/
-        Bounds();
+        ClampToBounds();
         repelArea.radius = smoolsController.RepelRange;
     }
 
-    private void Bounds()
+    private void ClampToBounds()
     {
         
         if ((xBounds < rb.transform.position.x) && rb.transform.position.x > bounds.transform.position.x)
@@ -170,3 +170,4 @@ public class PackBehaviour : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, smoolsController.RepelRange);*/
     }
 }
+    
