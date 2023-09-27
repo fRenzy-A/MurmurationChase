@@ -159,7 +159,7 @@ public class PackBehaviour : MonoBehaviour
         {
             Vector3 dir = other.transform.position - transform.position;
             dir = -dir;
-            rb.AddForce(dir * (smoolsController.RepelMultiplier), ForceMode.Impulse);
+            rb.AddForce(dir * (smoolsController.RepelMultiplier), ForceMode.Force);
         }
     }
     private void OnDrawGizmosSelected()
