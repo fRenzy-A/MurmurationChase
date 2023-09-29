@@ -16,17 +16,25 @@ public class FreeCamLook : MonoBehaviour
 
     float xRotation;
     float yRotation;
+
+    public bool canLook;
     // Start is called before the first frame update
     void Start()
     {
         cam = GetComponentInChildren<Camera>();
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        canLook = false;
     }
 
     // Update is called once per frame
     void Update()
+    {
+        if (canLook)
+        {
+            LookAround();
+        }
+        
+    }
+    void LookAround()
     {
         mouseX = Input.GetAxisRaw("Mouse X");
         mouseY = Input.GetAxisRaw("Mouse Y");
@@ -38,5 +46,4 @@ public class FreeCamLook : MonoBehaviour
         cam.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
         transform.rotation = Quaternion.Euler(0, yRotation, 0);
     }
-
 }

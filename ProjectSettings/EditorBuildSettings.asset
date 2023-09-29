@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Smools-Emergent.unity
+    guid: 51a9eed299f76ef43919a2c1189e500a
   m_configObjects: {}
